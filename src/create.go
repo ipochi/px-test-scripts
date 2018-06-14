@@ -24,10 +24,10 @@ func Create(number int) {
 		}
 	}
 
-	// err = createNamespace(number)
-	// if err != nil {
-	// 	log.Printf("Error creating namespace ::: %s", err)
-	// }
+	err = createNamespace(number)
+	if err != nil {
+		log.Printf("Error creating namespace ::: %s", err)
+	}
 	// err = createStorageClass()
 	// if err != nil {
 	// 	log.Printf("Error creating storage class ::: %s", err)
@@ -88,9 +88,15 @@ func createNamespace(number int) error {
 	}
 
 	for _, uuid := range uuids[len(uuids)-number:] {
-		//cmd := exec.Command("kubectl create ns", "ns-"+uuid)
-		cmd := exec.Command("echo", "ns-"+uuid)
-		stdout, err := cmd.CombinedOutput()
+		var stderr bytes.Buffer
+
+		fmt.Println(uuid)
+		cmd := exec.Command("kubectl", "create", "ns", "ns-"+uuid)
+		//cmd := exec.Command("echo", "ns-"+uuid)
+		cmd.Stderr = &stderr
+		stdout, err := cmd.Output()
+
+		fmt.Println("Stderr --- ", stderr.String())
 		if err != nil {
 			return err
 		}
@@ -102,8 +108,8 @@ func createNamespace(number int) error {
 func createStorageClass() error {
 
 	fileLocation := "src/storageclass/sc.yaml"
-	//cmd := exec.Command("kubectl apply -f", fileLocation)
-	cmd := exec.Command("cat", fileLocation)
+	cmd := exec.Command("kubectl", "create", "-f", fileLocation)
+	//cmd := exec.Command("cat", fileLocation)
 	stdout, err := cmd.CombinedOutput()
 	if err != nil {
 		return err
@@ -131,7 +137,7 @@ func deployWordpress(number int) error {
 		//+ " | kubectl apply -f -"
 		fmt.Println("Printing command ::: ", command)
 		cmd := exec.Command("kubetpl", "render", fileLocation, "-s", command)
-		kubectl := exec.Command("kubectl apply -f -")
+		kubectl := exec.Command("kubectl", "apply", "-f", "-")
 
 		pipe, err := cmd.StdoutPipe()
 		defer pipe.Close()

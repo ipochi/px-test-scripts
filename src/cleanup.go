@@ -17,10 +17,10 @@ func Cleanup() {
 	if err != nil {
 		log.Printf("Error deploying wordpress ::: %s", err)
 	}
-	err = deleteStorageClass()
-	if err != nil {
-		log.Printf("Error deleting storage class ::: %s", err)
-	}
+	// err = deleteStorageClass()
+	// if err != nil {
+	// 	log.Printf("Error deleting storage class ::: %s", err)
+	// }
 	err = deleteNameSpaces()
 	if err != nil {
 		log.Printf("Error deleting namespace ::: %s", err)
@@ -34,8 +34,8 @@ func deleteNameSpaces() error {
 	}
 
 	for _, uuid := range uuids {
-		//cmd := exec.Command("kubectl delete ns", "ns-"+uuid)
-		cmd := exec.Command("echo", "ns-"+uuid)
+		cmd := exec.Command("kubectl", "delete", "ns", "ns-"+uuid)
+		//cmd := exec.Command("echo", "ns-"+uuid)
 		stdout, err := cmd.CombinedOutput()
 		if err != nil {
 			return err
@@ -55,8 +55,8 @@ func deleteNameSpaces() error {
 func deleteStorageClass() error {
 
 	fileLocation := "src/storageclass/sc.yaml"
-	//cmd := exec.Command("kubectl delete -f", fileLocation)
-	cmd := exec.Command("cat", fileLocation)
+	cmd := exec.Command("kubectl", "delete", "-f", fileLocation)
+	//cmd := exec.Command("cat", fileLocation)
 
 	stdout, err := cmd.CombinedOutput()
 	if err != nil {
@@ -85,7 +85,7 @@ func deleteWordpress() error {
 		//+ " | kubectl apply -f -"
 		fmt.Println("Printing command ::: ", command)
 		cmd := exec.Command("kubetpl", "render", fileLocation, "-s", command)
-		kubectl := exec.Command("kubectl apply -f -")
+		kubectl := exec.Command("kubectl", "delete", "-f", "-")
 
 		pipe, err := cmd.StdoutPipe()
 		defer pipe.Close()
