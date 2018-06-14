@@ -11,17 +11,18 @@ import (
 func Cleanup() {
 
 	var err error
-	err = deleteNameSpaces()
+
+	err = deleteWordpress()
 	if err != nil {
-		log.Printf("Error deleting namespace ::: %s", err)
+		log.Printf("Error deploying wordpress ::: %s", err)
 	}
 	err = deleteStorageClass()
 	if err != nil {
 		log.Printf("Error deleting storage class ::: %s", err)
 	}
-	err = deleteWordpress()
+	err = deleteNameSpaces()
 	if err != nil {
-		log.Printf("Error deploying wordpress ::: %s", err)
+		log.Printf("Error deleting namespace ::: %s", err)
 	}
 }
 
