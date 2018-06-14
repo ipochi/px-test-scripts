@@ -2,6 +2,7 @@ package src
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/hex"
 	"fmt"
 	"log"
@@ -23,14 +24,14 @@ func Create(number int) {
 		}
 	}
 
-	err = createNamespace(number)
-	if err != nil {
-		log.Printf("Error creating namespace ::: %s", err)
-	}
-	err = createStorageClass()
-	if err != nil {
-		log.Printf("Error creating storage class ::: %s", err)
-	}
+	// err = createNamespace(number)
+	// if err != nil {
+	// 	log.Printf("Error creating namespace ::: %s", err)
+	// }
+	// err = createStorageClass()
+	// if err != nil {
+	// 	log.Printf("Error creating storage class ::: %s", err)
+	// }
 	err = deployWordpress(number)
 	if err != nil {
 		log.Printf("Error deploying wordpress ::: %s", err)
@@ -114,6 +115,9 @@ func createStorageClass() error {
 
 func deployWordpress(number int) error {
 
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+
 	fileLocation := "src/wordpress/wp.yaml"
 
 	uuids, err := readUUIDsFromFile()
@@ -123,16 +127,34 @@ func deployWordpress(number int) error {
 
 	for _, uuid := range uuids[len(uuids)-number:] {
 
-		command := "kubetpl render " + fileLocation + " -s NAMESPACE=" + "ns-" + uuid + " | kubectl apply -f -"
-		cmd := exec.Command(command)
+		command := "NAMESPACE=ns-" + uuid
+		//+ " | kubectl apply -f -"
+		fmt.Println("Printing command ::: ", command)
+		cmd := exec.Command("kubetpl", "render", fileLocation, "-s", command)
+		kubectl := exec.Command("kubectl apply -f -")
 
-		//cmd := exec.Command("echo", "ns-"+uuid)
-		stdout, err := cmd.CombinedOutput()
+		pipe, err := cmd.StdoutPipe()
+		defer pipe.Close()
 		if err != nil {
 			return err
 		}
-		fmt.Println("Printing output ::: ", string(stdout))
-	}
 
+		kubectl.Stdin = pipe
+		err = cmd.Start()
+		if err != nil {
+			return err
+		}
+
+		kubectl.Stdout = &out
+		kubectl.Stderr = &stderr
+
+		//cmd := exec.Command("echo", "ns-"+uuid)
+		err = kubectl.Run()
+		if err != nil {
+			fmt.Println("Printing output ::: ", stderr.String())
+			return err
+		}
+		fmt.Println("Printing output ::: ", out.String())
+	}
 	return nil
 }

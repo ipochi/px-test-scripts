@@ -1,6 +1,7 @@
 package src
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"os"
@@ -67,6 +68,10 @@ func deleteStorageClass() error {
 }
 
 func deleteWordpress() error {
+
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+
 	fileLocation := "src/wordpress/wp.yaml"
 
 	uuids, err := readUUIDsFromFile()
@@ -76,15 +81,34 @@ func deleteWordpress() error {
 
 	for _, uuid := range uuids {
 
-		command := "kubetpl render " + fileLocation + " -s NAMESPACE=" + "ns-" + uuid + " | kubectl delete -f -"
-		cmd := exec.Command(command)
+		command := "NAMESPACE=ns-" + uuid
+		//+ " | kubectl apply -f -"
+		fmt.Println("Printing command ::: ", command)
+		cmd := exec.Command("kubetpl", "render", fileLocation, "-s", command)
+		kubectl := exec.Command("kubectl apply -f -")
 
-		stdout, err := cmd.CombinedOutput()
+		pipe, err := cmd.StdoutPipe()
+		defer pipe.Close()
 		if err != nil {
 			return err
 		}
-		fmt.Println("Printing output ::: ", string(stdout))
-	}
 
+		kubectl.Stdin = pipe
+		err = cmd.Start()
+		if err != nil {
+			return err
+		}
+
+		kubectl.Stdout = &out
+		kubectl.Stderr = &stderr
+
+		//cmd := exec.Command("echo", "ns-"+uuid)
+		err = kubectl.Run()
+		if err != nil {
+			fmt.Println("Printing output ::: ", stderr.String())
+			return err
+		}
+		fmt.Println("Printing output ::: ", out.String())
+	}
 	return nil
 }
