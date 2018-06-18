@@ -20,12 +20,14 @@ func CreateSnapshots(number int) error {
 
 	for _, uuid := range uuids[len(uuids)-number:] {
 
+		snap_uuid := generateUUID()
+
 		replace := "NAMESPACE=ns-" + uuid
-		cmd := exec.Command("kubetpl", "render", fileLocation, "-s", replace)
+		snapreplace := "RANDOM_UUID=" + snap_uuid
+		cmd := exec.Command("kubetpl", "render", fileLocation, "-s", replace, "-s", snapreplace)
 		kubectl := exec.Command("kubectl", "apply", "-f", "-")
 
 		pipe, err := cmd.StdoutPipe()
-		fmt.Println("pipe ---, ", pipe)
 		defer pipe.Close()
 		if err != nil {
 			return err

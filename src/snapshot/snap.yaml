@@ -1,7 +1,9 @@
+# kubetpl:syntax:$
+
 apiVersion: volumesnapshot.external-storage.k8s.io/v1
 kind: VolumeSnapshot
 metadata:
-  name: mysql-snapshot
+  name: mysql-snapshot-$RANDOM_UUID
   namespace: $NAMESPACE
 spec:
   persistentVolumeClaimName: mysql-pvc-$NAMESPACE

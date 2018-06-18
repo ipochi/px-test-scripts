@@ -13,10 +13,10 @@ func Cleanup() {
 
 	var err error
 
-	err = deleteWordpress()
-	if err != nil {
-		log.Printf("Error deploying wordpress ::: %s", err)
-	}
+	// err = deleteWordpress()
+	// if err != nil {
+	// 	log.Printf("Error deploying wordpress ::: %s", err)
+	// }
 	// err = deleteStorageClass()
 	// if err != nil {
 	// 	log.Printf("Error deleting storage class ::: %s", err)
