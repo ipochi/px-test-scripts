@@ -11,7 +11,6 @@ import (
 
 var (
 	cfgFile string
-	number  int
 )
 
 // rootCmd represents the base command when called without any subcommands

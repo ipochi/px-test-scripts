@@ -7,6 +7,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var number int
+var wpnumber int
+
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create",
@@ -24,6 +27,10 @@ func init() {
 	rootCmd.AddCommand(createCmd)
 	createCmd.PersistentFlags().IntVarP(&number, "number", "n", 5, "Number of namespaces")
 	createCmd.MarkFlagRequired("number")
+
+	createCmd.PersistentFlags().IntVarP(&wpnumber, "wordpress", "w", 2, "Number of wordpress installations per namespace")
+	createCmd.MarkFlagRequired("wpnumber")
+
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
@@ -36,6 +43,6 @@ func init() {
 }
 
 func createAction(cmd *cobra.Command, args []string) {
-	fmt.Println("create called with number -- ", number)
-	src.Create(number)
+	fmt.Println("create called with number -- ", number, " and wpnumber -- ", wpnumber)
+	src.Create(number, wpnumber)
 }

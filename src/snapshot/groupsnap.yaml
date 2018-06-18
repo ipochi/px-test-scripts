@@ -5,5 +5,8 @@ kind: VolumeSnapshot
 metadata:
   name: mysql-snapshot-$RANDOM_UUID
   namespace: $NAMESPACE
+  annotations:
+    portworx/snapshot-type: local
+    portworx.selector/group: $SNAP_GROUP
 spec:
-  persistentVolumeClaimName: mysql-pvc-$NAMESPACE-$WP_NUMBER
+  persistentVolumeClaimName: mysql-pvc

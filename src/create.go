@@ -8,11 +8,12 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 
 	uuid "github.com/satori/go.uuid"
 )
 
-func Create(number int) {
+func Create(number, wpnumber int) {
 
 	var err error
 
@@ -32,7 +33,7 @@ func Create(number int) {
 	// if err != nil {
 	// 	log.Printf("Error creating storage class ::: %s", err)
 	// }
-	err = deployWordpress(number)
+	err = deployWordpress(number, wpnumber)
 	if err != nil {
 		log.Printf("Error deploying wordpress ::: %s", err)
 	}
@@ -119,7 +120,7 @@ func createStorageClass() error {
 	return nil
 }
 
-func deployWordpress(number int) error {
+func deployWordpress(number, wpnumber int) error {
 
 	var out bytes.Buffer
 	var stderr bytes.Buffer
@@ -133,34 +134,36 @@ func deployWordpress(number int) error {
 
 	for _, uuid := range uuids[len(uuids)-number:] {
 
-		command := "NAMESPACE=ns-" + uuid
-		//+ " | kubectl apply -f -"
-		fmt.Println("Printing command ::: ", command)
-		cmd := exec.Command("kubetpl", "render", fileLocation, "-s", command)
-		kubectl := exec.Command("kubectl", "apply", "-f", "-")
+		for i := 0; i < wpnumber; i++ {
+			ns := "NAMESPACE=ns-" + uuid
+			wp := "WP_NUMBER=" + strconv.Itoa(i)
 
-		pipe, err := cmd.StdoutPipe()
-		defer pipe.Close()
-		if err != nil {
-			return err
+			cmd := exec.Command("kubetpl", "render", fileLocation, "-s", ns, "-s", wp)
+			kubectl := exec.Command("kubectl", "apply", "-f", "-")
+
+			pipe, err := cmd.StdoutPipe()
+			defer pipe.Close()
+			if err != nil {
+				return err
+			}
+
+			kubectl.Stdin = pipe
+			err = cmd.Start()
+			if err != nil {
+				return err
+			}
+
+			kubectl.Stdout = &out
+			kubectl.Stderr = &stderr
+
+			//cmd := exec.Command("echo", "ns-"+uuid)
+			err = kubectl.Run()
+			if err != nil {
+				fmt.Println("Printing output ::: ", stderr.String())
+				return err
+			}
+			fmt.Println("Printing output ::: ", out.String())
 		}
-
-		kubectl.Stdin = pipe
-		err = cmd.Start()
-		if err != nil {
-			return err
-		}
-
-		kubectl.Stdout = &out
-		kubectl.Stderr = &stderr
-
-		//cmd := exec.Command("echo", "ns-"+uuid)
-		err = kubectl.Run()
-		if err != nil {
-			fmt.Println("Printing output ::: ", stderr.String())
-			return err
-		}
-		fmt.Println("Printing output ::: ", out.String())
 	}
 	return nil
 }
