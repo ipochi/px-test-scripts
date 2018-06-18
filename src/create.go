@@ -63,7 +63,7 @@ func writeToFile(uuid string) error {
 	return nil
 }
 
-func readUUIDsFromFile() ([]string, error) {
+func readFromFile() ([]string, error) {
 
 	var uuids []string
 	f, err := os.Open("/tmp/ns-test")
@@ -82,7 +82,7 @@ func readUUIDsFromFile() ([]string, error) {
 }
 
 func createNamespace(number int) error {
-	uuids, err := readUUIDsFromFile()
+	uuids, err := readFromFile()
 	if err != nil {
 		return err
 	}
@@ -126,7 +126,7 @@ func deployWordpress(number int) error {
 
 	fileLocation := "src/wordpress/wp.yaml"
 
-	uuids, err := readUUIDsFromFile()
+	uuids, err := readFromFile()
 	if err != nil {
 		return err
 	}

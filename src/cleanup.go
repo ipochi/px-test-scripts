@@ -28,7 +28,7 @@ func Cleanup() {
 }
 
 func deleteNameSpaces() error {
-	uuids, err := readUUIDsFromFile()
+	uuids, err := readFromFile()
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ func deleteWordpress() error {
 
 	fileLocation := "src/wordpress/wp.yaml"
 
-	uuids, err := readUUIDsFromFile()
+	uuids, err := readFromFile()
 	if err != nil {
 		return err
 	}
