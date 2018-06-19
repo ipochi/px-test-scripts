@@ -134,11 +134,17 @@ func deployWordpress(number, wpnumber int) error {
 
 	for _, uuid := range uuids[len(uuids)-number:] {
 
+		mysqlport := 3306
+		wpport := 80
+
 		for i := 0; i < wpnumber; i++ {
 			ns := "NAMESPACE=ns-" + uuid
 			wp := "WP_NUMBER=" + strconv.Itoa(i)
-
-			cmd := exec.Command("kubetpl", "render", fileLocation, "-s", ns, "-s", wp)
+			smysqlport := "MYSQL_PORT=" + strconv.Itoa(mysqlport)
+			swpport := "WP_PORT=" + strconv.Itoa(wpport)
+			mysqlport++
+			wpport++
+			cmd := exec.Command("kubetpl", "render", fileLocation, "-s", ns, "-s", wp, "-s", smysqlport, "-s", swpport)
 			kubectl := exec.Command("kubectl", "apply", "-f", "-")
 
 			pipe, err := cmd.StdoutPipe()

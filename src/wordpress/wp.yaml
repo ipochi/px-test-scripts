@@ -25,9 +25,9 @@ metadata:
   name: wp-pv-$NAMESPACE-$WP_NUMBER
   namespace: $NAMESPACE
   labels:
-    tier: prod
-    name: db  
-    app: wordpress
+    tier: prod-$WP_NUMBER
+    name: db-$WP_NUMBER
+    app: wordpress-$WP_NUMBER
   annotations:
     volume.beta.kubernetes.io/storage-class: portworx-sc-repl3-shared-snap60
 spec:
@@ -40,33 +40,34 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: wordpress-mysql
+  name: wordpress-mysql-$WP_NUMBER
   namespace: $NAMESPACE
   labels:
-    app: wordpress
+    app: wordpress-$WP_NUMBER
 spec:
   ports:
-    - port: 3306
+    - port: $MYSQL_PORT
+      targetPort: 3306
   selector:
-    app: wordpress
-    tier: mysql
+    app: wordpress-$WP_NUMBER
+    tier: mysql-$WP_NUMBER
   clusterIP: None
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: wordpress-mysql
+  name: wordpress-mysql-$WP_NUMBER
   namespace: $NAMESPACE
   labels:
-    app: wordpress
+    app: wordpress-$WP_NUMBER
 spec:
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: wordpress
-        tier: mysql
+        app: wordpress-$WP_NUMBER
+        tier: mysql-$WP_NUMBER
     spec:
       # Use the stork scheduler to enable more efficient placement of the pods
       schedulerName: stork
@@ -91,35 +92,35 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: wordpress
+  name: wordpress-$WP_NUMBER
   namespace: $NAMESPACE
   labels:
-    app: wordpress
+    app: wordpress-$WP_NUMBER
 spec:
   ports:
-    - port: 80
-      # nodePort: 30303
+    - port: $WP_PORT
+      targetPort: 80
   selector:
-    app: wordpress
-    tier: frontend
+    app: wordpress-$WP_NUMBER
+    tier: frontend-$WP_NUMBER
   type: NodePort
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: wordpress
+  name: wordpress-$WP_NUMBER
   namespace: $NAMESPACE
   labels:
-    app: wordpress
+    app: wordpress-$WP_NUMBER
 spec:
-  replicas: 3
+  replicas: 1
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: wordpress
-        tier: frontend
+        app: wordpress-$WP_NUMBER
+        tier: frontend-$WP_NUMBER
     spec:
       # Use the stork scheduler to enable more efficient placement of the pods
       schedulerName: stork
