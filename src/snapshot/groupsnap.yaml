@@ -3,10 +3,12 @@
 apiVersion: volumesnapshot.external-storage.k8s.io/v1
 kind: VolumeSnapshot
 metadata:
-  name: mysql-snapshot-$NAMESPACE-$WP_NUMBER-$RANDOM_UUID
+  name: mysql-snapshot-$NAMESPACE-$RANDOM_UUID
   namespace: $NAMESPACE
+  labels:
+    snap-group-ns: $NAMESPACE
   annotations:
     portworx/snapshot-type: local
     portworx.selector/group: $SNAP_GROUP
 spec:
-  persistentVolumeClaimName: mysql-pvc
+  persistentVolumeClaimName: mysql-pvc-$NAMESPACE-0

@@ -51,7 +51,7 @@ spec:
   selector:
     app: wordpress-$WP_NUMBER
     tier: mysql-$WP_NUMBER
-  clusterIP: None
+  # clusterIP: None
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment

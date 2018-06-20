@@ -75,7 +75,8 @@ func CreateGroupSnapshot() error {
 		snapgroup := "SNAP_GROUP=ns-" + uuid
 
 		snapuuid := "RANDOM_UUID=" + gsuuid
-		cmd := exec.Command("kubetpl", "render", fileLocation, "-s", ns, "-s", snapuuid, "=s", snapgroup)
+		cmd := exec.Command("kubetpl", "render", fileLocation, "-s", ns, "-s", snapuuid, "-s", snapgroup)
+
 		kubectl := exec.Command("kubectl", "apply", "-f", "-")
 
 		pipe, err := cmd.StdoutPipe()
