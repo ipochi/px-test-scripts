@@ -144,7 +144,9 @@ func deployWordpress(number, wpnumber int) error {
 			swpport := "WP_PORT=" + strconv.Itoa(wpport)
 			mysqlport++
 			wpport++
+			//cmd := exec.Command("/bin/bash")
 			cmd := exec.Command("kubetpl", "render", fileLocation, "-s", ns, "-s", wp, "-s", smysqlport, "-s", swpport)
+
 			kubectl := exec.Command("kubectl", "apply", "-f", "-")
 
 			pipe, err := cmd.StdoutPipe()

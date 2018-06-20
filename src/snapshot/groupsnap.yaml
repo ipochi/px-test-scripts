@@ -3,7 +3,7 @@
 apiVersion: volumesnapshot.external-storage.k8s.io/v1
 kind: VolumeSnapshot
 metadata:
-  name: mysql-snapshot-$RANDOM_UUID
+  name: mysql-snapshot-$NAMESPACE-$WP_NUMBER-$RANDOM_UUID
   namespace: $NAMESPACE
   annotations:
     portworx/snapshot-type: local
