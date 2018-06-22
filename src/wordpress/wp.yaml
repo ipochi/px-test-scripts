@@ -43,13 +43,13 @@ metadata:
   name: wordpress-mysql-$WP_NUMBER
   namespace: $NAMESPACE
   labels:
-    app: wordpress-$WP_NUMBER
+    app: wordpress-mysql-$WP_NUMBER
 spec:
-  ports:
+  ports:  
     - port: $MYSQL_PORT
       targetPort: 3306
   selector:
-    app: wordpress-$WP_NUMBER
+    app: wordpress-mysql-$WP_NUMBER
     tier: mysql-$WP_NUMBER
   # clusterIP: None
 ---
@@ -59,14 +59,14 @@ metadata:
   name: wordpress-mysql-$WP_NUMBER
   namespace: $NAMESPACE
   labels:
-    app: wordpress-$WP_NUMBER
+    app: wordpress-mysql-$WP_NUMBER
 spec:
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: wordpress-$WP_NUMBER
+        app: wordpress-mysql-$WP_NUMBER
         tier: mysql-$WP_NUMBER
     spec:
       # Use the stork scheduler to enable more efficient placement of the pods
