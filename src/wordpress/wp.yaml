@@ -130,7 +130,7 @@ spec:
         imagePullPolicy: 
         env:
         - name: WORDPRESS_DB_HOST
-          value: wordpress-mysql-$WP_NUMBER
+          value: wordpress-mysql-$WP_NUMBER:$MYSQL_PORT
         - name: WORDPRESS_DB_PASSWORD
           value: password
         ports:
